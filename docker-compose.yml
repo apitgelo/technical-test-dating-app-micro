@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  app:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - ${PORT}:${PORT}
+    environment:
+      PORT: 3000
+      NODE_ENV: production
+      MONGODB_URI_SCHEME: mongodb
+      MONGODB_PORT: 27017
+      MONGODB_HOST: mongo
+      MONGODB_DATABASE: dating-app-micro
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:

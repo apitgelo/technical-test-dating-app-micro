@@ -1,0 +1,555 @@
+openapi: 3.0.0
+info:
+  title: Dating App Microservice
+  description: A RESTful API using TypeScript for dating app microservice
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Local server
+tags:
+  - name: auth
+    description: Authentication endpoints
+  - name: profile
+    description: Profile endpoints
+  - name: swipe
+    description: Swipe endpoints
+  - name: premium
+    description: Premium endpoints
+paths:
+  /auth/register:
+    post:
+      tags:
+        - auth
+      summary: Registers a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      example: apitgelo@gmail.com
+                    password:
+                      type: string
+                      example: password
+                  required:
+                    - email
+                    - password
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User registered successfully
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      status:
+                        type: integer
+                        example: 409
+                      code:
+                        type: string
+                        example: CONFLICTERROR
+                      message:
+                        type: string
+                        example: User with email apitgelo@gmail.com already exists
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      status:
+                        type: integer
+                        example: 422
+                      code:
+                        type: string
+                        example: VALIDATIONERROR
+                      message:
+                        type: string
+                        example: email must be an email
+  /auth/login:
+    post:
+      tags:
+        - auth
+      summary: Authenticates an existing user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      example: apitgelo@gmail.com
+                    password:
+                      type: string
+                      example: password
+                  required:
+                    - email
+                    - password
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MDYwZjQwZjQwZjQwZjQwZjQwZjQwZjQiLCJlbWFpbCI6ImFwaXRnZWxvQGdtYWlsLmNvbSIsImlhdCI6MTYxNjIwNjIwMiwiZXhwIjoxNjE2MjA5ODAyfQ.7
+                  expiresIn:
+                    type: integer
+                    example: 3600
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      status:
+                        type: integer
+                        example: 401
+                      code:
+                        type: string
+                        example: UNAUTHORIZEDERROR
+                      message:
+                        type: string
+                        example: Invalid credentials
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      status:
+                        type: integer
+                        example: 404
+                      code:
+                        type: string
+                        example: NOTFOUNDERROR
+                      message:
+                        type: string
+                        example: User with email apitgelo@gmail.com not found
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      status:
+                        type: integer
+                        example: 422
+                      code:
+                        type: string
+                        example: VALIDATIONERROR
+                      message:
+                        type: string
+                        example: email must be an email'
+  /profile/me:
+    get:
+      tags:
+        - profile
+      summary: Retrieves the logged-in user's profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      userId:
+                        type: string
+                        example: 6060f40f40f40f40f40f40f4
+                      email:
+                        type: string
+                        example: apitgelo@gmail.com
+                      firstName:
+                        type: string
+                        example: Hafidz
+                      lastName:
+                        type: string
+                        example: Prasetya
+                      age:
+                        type: integer
+                        example: 25
+                      gender:
+                        type: string
+                        enum: [male, female]
+                        example: male
+                      bio:
+                        type: string
+                        example: I'm a software engineer
+                      photos:
+                        type: array
+                        items:
+                          type: string
+                          example: https://example.com/photo.jpg
+                      location:
+                        type: string
+                        example: Jakarta, Indonesia
+                      interests:
+                        type: array
+                        items:
+                          type: string
+                          example: Music, Movies, Travel
+    put:
+      tags:
+        - profile
+      summary: Updates the logged-in user's profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    firstName:
+                      type: string
+                      example: Hafidz
+                    lastName:
+                      type: string
+                      example: Prasetya
+                    age:
+                      type: integer
+                      example: 25
+                    gender:
+                      type: string
+                      example: male
+                    bio:
+                      type: string
+                      example: I'm a software engineer
+                    photos:
+                      type: array
+                      items:
+                        type: string
+                        example: https://example.com/photo.jpg
+                    location:
+                      type: string
+                      example: Jakarta, Indonesia
+                    interests:
+                      type: array
+                      items:
+                        type: string
+                        example: Music, Movies, Travel
+                  required:
+                    - firstName
+                    - age
+                    - gender
+                    - location
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User profile updated successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      status:
+                        type: integer
+                        example: 401
+                      code:
+                        type: string
+                        example: UNAUTHORIZEDERROR
+                      message:
+                        type: string
+                        example: Unauthorized
+  /profile/cards:
+    get:
+      tags:
+        - profile
+      summary: Retrieves a list of user cards
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        profileId:
+                          type: string
+                          example: 6060f40f40f40f40f40f40f4
+                        firstName:
+                          type: string
+                          example: Hafidz
+                        lastName:
+                          type: string
+                          example: Prasetya
+                        age:
+                          type: integer
+                          example: 25
+                        gender:
+                          type: string
+                          example: male
+                        bio:
+                          type: string
+                          example: I'm a software engineer
+                        photos:
+                          type: array
+                          items:
+                            type: string
+                            example: https://example.com/photo.jpg
+                        location:
+                          type: string
+                          example: Jakarta, Indonesia
+                        interests:
+                          type: array
+                          items:
+                            type: string
+                            example: Music, Movies, Travel
+  /swipe:
+    post:
+      tags:
+        - swipe
+      summary: Swipes (like or dislike) on a user
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    userId:
+                      type: string
+                      example: 6060f40f40f40f40f40f40f4
+                    action:
+                      type: string
+                      enum: [like, dislike]
+                      example: like
+                  required:
+                    - userId
+                    - action
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User swiped successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      status:
+                        type: integer
+                        example: 401
+                      code:
+                        type: string
+                        example: UNAUTHORIZEDERROR
+                      message:
+                        type: string
+                        example: Unauthorized
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      status:
+                        type: integer
+                        example: 404
+                      code:
+                        type: string
+                        example: NOTFOUNDERROR
+                      message:
+                        type: string
+                        example: User with id 6060f40f40f40f40f40f40f4 not found
+  /premium/packages:
+    get:
+      tags:
+        - premium
+      summary: Lists available premium packages
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 6060f40f40f40f40f40f40f4
+                        name:
+                          type: string
+                          example: Gold
+                        description:
+                          type: string
+                          example: 30 days of premium access
+                        price:
+                          type: number
+                          example: 100
+                        duration:
+                          type: integer
+                          example: 30
+  /premium/subscribe:
+    post:
+      tags:
+        - premium
+      summary: Subscribes to a premium package
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    packageId:
+                      type: string
+                      example: 6060f40f40f40f40f40f40f4
+                  required:
+                    - packageId
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Subscription created successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      status:
+                        type: integer
+                        example: 401
+                      code:
+                        type: string
+                        example: UNAUTHORIZEDERROR
+                      message:
+                        type: string
+                        example: Unauthorized
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      status:
+                        type: integer
+                        example: 404
+                      code:
+                        type: string
+                        example: NOTFOUNDERROR
+                      message:
+                        type: string
+                        example: Package with id 6060f40f40f40f40f40f40f4 not found
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

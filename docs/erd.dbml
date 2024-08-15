@@ -1,0 +1,60 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table users {
+  id string [primary key]
+  email string
+  password string
+  isPremium boolean
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+Table profiles {
+  id string [primary key]
+  userId string
+  firstName string
+  lastName string
+  age number
+  gender string
+  bio string
+  photos string[]
+  location string
+  interests string[]
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+Ref: users.id - profiles.userId
+
+Table swipes {
+  id string [primary key]
+  userId string
+  profileId string
+  type string
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+Ref: swipes.profileId > profiles.id
+Ref: swipes.userId > users.id
+
+Table packages {
+  id string [primary key]
+  name string
+  description string
+  price number
+  duration number
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+Table purchases {
+  id string [primary key]
+  userId number
+  packageId number
+  createdAt timestamp
+}
+
+Ref: purchases.userId > users.id
+Ref: purchases.packageId > packages.id

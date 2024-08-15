@@ -1,0 +1,85 @@
+@startuml
+actor User
+participant APIGateway as "API Gateway"
+participant AuthService as "Auth Service"
+participant UserService as "User Service"
+participant SwipeService as "Swipe Service"
+participant PackageService as "Package Service"
+participant Database
+
+alt User registration
+  User -> APIGateway: POST /auth/register
+  APIGateway -> AuthService: POST /auth/register
+  AuthService -> Database: check if email not exists
+  Database --> AuthService: email not exists
+  AuthService -> Database: create user
+  Database --> AuthService: user created
+  AuthService --> APIGateway: user created
+  APIGateway --> User: user created
+end
+
+alt User login
+  User -> APIGateway: POST /auth/login
+  APIGateway -> AuthService: POST /auth/login
+  AuthService -> Database: find user by email
+  Database --> AuthService: user found
+  AuthService -> AuthService: compare password
+  AuthService --> APIGateway: jwt token
+  APIGateway --> User: jwt token
+end
+
+alt Get profile
+  User -> APIGateway: GET /profile/me
+  APIGateway -> UserService: GET /profile/me
+  UserService -> Database: find profile by user id
+  Database --> UserService: profile found
+  UserService --> APIGateway: profile
+  APIGateway --> User: profile
+end
+
+alt Update profile
+  User -> APIGateway: PUT /profile/me
+  APIGateway -> UserService: PUT /profile/me
+  UserService -> Database: update profile by user id
+  Database --> UserService: profile updated
+  UserService --> APIGateway: profile
+  APIGateway --> User: profile
+end
+
+alt Get cards
+  User -> APIGateway: GET /profile/cards
+  APIGateway -> UserService: GET /profile/cards
+  UserService -> Database: find not swiped profiles
+  Database --> UserService: profiles found
+  UserService --> APIGateway: profiles
+  APIGateway --> User: profiles
+end
+
+alt Swipe
+  User -> APIGateway: POST /swipe
+  APIGateway -> SwipeService: POST /swipe
+  SwipeService -> Database: create swipe by user id
+  Database --> SwipeService: swipe created
+  SwipeService --> APIGateway: swipe
+  APIGateway --> User: swipe
+end
+
+alt Get packages
+  User -> APIGateway: GET /premium/packages
+  APIGateway -> PackageService: GET /premium/packages
+  PackageService -> Database: find packages
+  Database --> PackageService: packages found
+  PackageService --> APIGateway: packages
+  APIGateway --> User: packages
+end
+
+alt Subscribe package
+  User -> APIGateway: POST /premium/subscribe
+  APIGateway -> PackageService: POST /premium/subscribe
+  PackageService -> Database: create subscription by user id
+  Database --> PackageService: subscription created
+  PackageService --> APIGateway: subscription
+  APIGateway --> User: subscription
+end
+
+@enduml
