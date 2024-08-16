@@ -384,7 +384,7 @@ paths:
                 data:
                   type: object
                   properties:
-                    userId:
+                    profileId:
                       type: string
                       example: 6060f40f40f40f40f40f40f4
                     action:
@@ -392,7 +392,7 @@ paths:
                       enum: [like, dislike]
                       example: like
                   required:
-                    - userId
+                    - profileId
                     - action
       responses:
         '200':
@@ -443,6 +443,37 @@ paths:
                       message:
                         type: string
                         example: User with id 6060f40f40f40f40f40f40f4 not found
+  /swipe/today:
+    get:
+      tags:
+        - swipe
+      summary: Retrieves today's swipes
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        profileId:
+                          type: string
+                          example: 6060f40f40f40f40f40f40f4
+                        action:
+                          type: string
+                          enum: [like, dislike]
+                          example: like
+                        createdAt:
+                          type: string
+                          format: date-time
+                          example: 2021-03-20T00:00:00.000Z
   /premium/packages:
     get:
       tags:

@@ -2,9 +2,10 @@
 actor User
 participant APIGateway as "API Gateway"
 participant AuthService as "Auth Service"
-participant UserService as "User Service"
 participant SwipeService as "Swipe Service"
 participant PackageService as "Package Service"
+participant UserService as "User Service"
+participant Redis as "Redis"
 participant Database
 
 alt User registration
@@ -49,6 +50,10 @@ end
 alt Get cards
   User -> APIGateway: GET /profile/cards
   APIGateway -> UserService: GET /profile/cards
+  UserService -> SwipeService: GET /swipe/today
+  SwipeService -> Database: find swiped profiles
+  Database --> SwipeService: swiped profiles
+  SwipeService --> UserService: swiped profiles
   UserService -> Database: find not swiped profiles
   Database --> UserService: profiles found
   UserService --> APIGateway: profiles
@@ -58,10 +63,20 @@ end
 alt Swipe
   User -> APIGateway: POST /swipe
   APIGateway -> SwipeService: POST /swipe
+  SwipeService -> UserService: GET /profile/me
+  UserService -> Database: find profile by user id
+  Database --> UserService: profile found
+  UserService --> SwipeService: profile
+  SwipeService -> SwipeService: check if user is premium
+  SwipeService -> Redis: get user swipe count
+  Redis --> SwipeService: user swipe count
+  SwipeService -> SwipeService: check if user can swipe
   SwipeService -> Database: create swipe by user id
   Database --> SwipeService: swipe created
-  SwipeService --> APIGateway: swipe
-  APIGateway --> User: swipe
+  SwipeService -> Redis: increment user swipe count
+  Redis --> SwipeService: user swipe count
+  SwipeService --> APIGateway: swipe quota
+  APIGateway --> User: swipe quota
 end
 
 alt Get packages
@@ -78,8 +93,12 @@ alt Subscribe package
   APIGateway -> PackageService: POST /premium/subscribe
   PackageService -> Database: create subscription by user id
   Database --> PackageService: subscription created
-  PackageService --> APIGateway: subscription
-  APIGateway --> User: subscription
+  PackageService -> UserService: PUT /profile/me
+  UserService -> Database: update profile is premium by user id
+  Database --> UserService: profile updated
+  UserService --> PackageService: profile
+  PackageService --> APIGateway: profile
+  APIGateway --> User: profile
 end
 
 @enduml
