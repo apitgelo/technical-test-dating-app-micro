@@ -48,6 +48,8 @@ You can find the API documentation in the [swagger.yaml](./docs/swagger.yaml) fi
 ```
 .
 ├── docs
+│   ├── erd.dbml
+│   ├── sequence-diagram.wsd
 │   └── swagger.yaml
 ├── src
 │   ├── config
@@ -80,6 +82,8 @@ You can find the API documentation in the [swagger.yaml](./docs/swagger.yaml) fi
 
 ### docs
 Folder that contains the documentations.
+- erd.dbml: Contains the Entity Relationship Diagram in DBML format.
+- sequence-diagram.wsd: Contains the sequence diagram in WSD format.
 - swagger.yaml: Contains the API documentation in OpenAPI format.
 
 ### src
